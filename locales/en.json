@@ -1,0 +1,73 @@
+{
+    "afk": {
+        "will_kick": "You're AFK and will be kicked in %s",
+        "seconds": "%s seconds",
+        "one_minute": "1 minute",
+        "minutes": "%s minutes",
+        "minutes_and_seconds": "%s and %s seconds",
+        "kick_message": "You were kicked for being AFK"
+    },
+    "wash": {
+        "prompt": "[%s] Wash the car",
+        "keybind": "Wash your car at a car wash",
+        "in_progress": "Washing vehicle...",
+        "clean": "The car is already clean",
+        "cancel": "Wash cancelled",
+        "done": "Your car is spotless",
+        "no_money": "You don't have enough money",
+        "blip": "Hands Free Carwash",
+        "blip_category": "Car Wash"
+    },
+    "consumables": {
+        "pack_parachute_progress": "Packing parachute...",
+        "no_parachute": "You don't have a parachute on",
+        "armor_full": "You already have enough armor on",
+        "armor_empty": "You're not wearing a vest",
+        "armor_damaged": "The vest is too shot up to wear again",
+        "remove_armor_progress": "Removing body armor...",
+        "police_only": "Police officers only",
+        "canceled": "Canceled"
+    },
+    "cruise": {
+        "activated": "Cruise control on",
+        "deactivated": "Cruise control off",
+        "not_enough_fuel": "Not enough fuel"
+    },
+    "editor": {
+        "started": "Recording started",
+        "clip": "Clip recording started",
+        "save": "Recording saved",
+        "delete": "Recording deleted",
+        "editor": "Opening the Rockstar Editor"
+    },
+    "firework": {
+        "time_left": "Firework launches in %s"
+    },
+    "teleport": {
+        "prompt": "Take the elevator",
+        "keybind": "Use a teleport or elevator"
+    },
+    "player": {
+        "id": "ID: %s"
+    },
+    "discord": {
+        "players": "Players: %s/%s"
+    },
+    "keys": {
+        "binoculars_store": "Put the binoculars away",
+        "crouch": "Toggle crouch",
+        "point": "Toggle pointing",
+        "tackle": "Tackle someone",
+        "cruise": "Toggle cruise control"
+    },
+    "commands": {
+        "id": "Show your server ID",
+        "resetarmor": "Take off your vest (police only)",
+        "resetparachute": "Pack your parachute",
+        "record": "Start recording for the Rockstar Editor",
+        "clip": "Start recording a clip for the Rockstar Editor",
+        "saveclip": "Stop recording and save the clip",
+        "delclip": "Stop recording and discard the clip",
+        "editor": "Open the Rockstar Editor"
+    }
+}
