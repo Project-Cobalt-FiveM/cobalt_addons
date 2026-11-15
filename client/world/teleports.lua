@@ -2,6 +2,7 @@ local config <const> = require 'config'
 local core <const> = exports.cobalt_core
 
 local FADE_MS <const> = 300
+local DEFAULT_PROMPT <const> = 'elevator'
 
 ---@class AddonsPortal
 ---@field coords vector3
@@ -9,7 +10,7 @@ local FADE_MS <const> = 300
 ---@field length number
 ---@field width number
 ---@field allowVehicle boolean
----@field label? string
+---@field prompt? string key under `teleport` in locales/en.json
 
 ---@class AddonsPortalLink
 ---@field portal AddonsPortal
@@ -25,6 +26,15 @@ local function hidePrompt()
 
     prompting = false
     core:HideTextUI()
+end
+
+---@return boolean
+local function canTravel()
+    local state <const> = LocalPlayer.state
+
+    if state.isDead or state.cuffed or state.escortedBy or state.jailed then return false end
+
+    return not IsEntityAttached(cache.ped) and not IsPedRagdoll(cache.ped)
 end
 
 ---@param link AddonsPortalLink
@@ -54,7 +64,7 @@ local keybind <const> = lib.addKeybind({
     onReleased = function()
         local link <const> = current
 
-        if not link or travelling then return end
+        if not link or travelling or not canTravel() then return end
 
         travelling = true
         hidePrompt()
@@ -68,7 +78,10 @@ local function enter(link)
     current = link
     keybind:disable(false)
     prompting = true
-    core:ShowTextUI(('[%s] %s'):format(keybind:getCurrentKey(), link.portal.label or locale('teleport.prompt')))
+
+    local action <const> = locale(('teleport.%s'):format(link.portal.prompt or DEFAULT_PROMPT))
+
+    core:ShowTextUI(locale('teleport.prompt', keybind:getCurrentKey(), action))
 end
 
 ---@param link AddonsPortalLink
@@ -96,5 +109,9 @@ for _, portals in ipairs(config.teleports) do
 end
 
 AddEventHandler('onResourceStop', function(resource)
-    if resource == cache.resource and (IsScreenFadedOut() or IsScreenFadingOut()) then DoScreenFadeIn(0) end
+    if resource ~= cache.resource then return end
+
+    hidePrompt()
+
+    if IsScreenFadedOut() or IsScreenFadingOut() then DoScreenFadeIn(0) end
 end)

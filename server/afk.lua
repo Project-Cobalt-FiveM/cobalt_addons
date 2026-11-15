@@ -12,6 +12,17 @@ local WARN_AT <const> = { 900, 600, 300, 150, 60, 30, 20, 10 }
 ---@field remaining? integer
 ---@field nextWarning integer index into WARN_AT of the next warning still to give
 
+---@return integer
+local function firstWarning()
+    for index, at in ipairs(WARN_AT) do
+        if at < config.afk.secondsUntilKick then return index end
+    end
+
+    return #WARN_AT + 1
+end
+
+local FIRST_WARNING <const> = firstWarning()
+
 ---@type table<integer, AfkState>
 local tracked <const> = {}
 
@@ -71,7 +82,7 @@ local function check(source)
     local state <const> = tracked[source]
 
     if not state or #(coords - state.coords) > MOVE_TOLERANCE then
-        tracked[source] = { coords = coords, nextWarning = 1 }
+        tracked[source] = { coords = coords, nextWarning = FIRST_WARNING }
         return
     end
 

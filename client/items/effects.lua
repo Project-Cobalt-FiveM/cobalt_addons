@@ -1,5 +1,6 @@
 local generation = 0
 local runCount = 0
+local showingVisual = false
 
 ---@type table<integer, number> sprint multiplier of each running stimulant
 local sprinting <const> = {}
@@ -77,13 +78,27 @@ local function screenEffect(started, prefix, hold)
 end
 
 ---@param started integer
+---@param prefix string
+---@param hold fun(): integer
+local function playVisual(started, prefix, hold)
+    if showingVisual then return end
+
+    showingVisual = true
+
+    CreateThread(function()
+        screenEffect(started, prefix, hold)
+        showingVisual = false
+    end)
+end
+
+---@param started integer
 local function trevorEffect(started)
-    screenEffect(started, CLOWNS, function() return 3000 end)
+    playVisual(started, CLOWNS, function() return 3000 end)
 end
 
 ---@param started integer
 local function alienEffect(started)
-    screenEffect(started, ALIENS, function() return math.random(5000, 8000) end)
+    playVisual(started, ALIENS, function() return math.random(5000, 8000) end)
 end
 
 ---@class AddonsStimulant
@@ -178,7 +193,6 @@ function Effects.coke()
 
             if roll(10, 300) then
                 alienEffect(started)
-                sleep(started, math.random(3000, 6000))
             end
         end,
     })
@@ -213,7 +227,9 @@ function Effects.oxy()
     for _ = 1, 9 do
         if not sleep(started, 1000) then return end
 
-        SetEntityHealth(cache.ped, GetEntityHealth(cache.ped) + 6)
+        local ped <const> = cache.ped
+
+        SetEntityHealth(ped, math.min(GetEntityMaxHealth(ped), GetEntityHealth(ped) + 6))
     end
 end
 

@@ -54,4 +54,8 @@ lib.callback.register('cobalt_addons:client:removeVest', function()
     return true, armour
 end)
 
+RegisterNetEvent('cobalt_core:Client:OnPlayerUnload', function()
+    savedVest = nil
+end)
+
 return Armor

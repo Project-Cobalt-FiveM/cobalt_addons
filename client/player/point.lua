@@ -78,7 +78,7 @@ local function toggle()
 end
 
 lib.addKeybind({
-    name = 'point',
+    name = 'cobalt_addons_point',
     description = locale('keys.point'),
     defaultKey = 'B',
     onPressed = toggle,

@@ -10,7 +10,7 @@ local CobaltAddonsExports = {}
 ---@return false?
 function CobaltAddonsExports:Armor(event, item, inventory) end
 
----**Server.** The parachute item's server export; marks the parachute for `/resetparachute`.
+---**Server.** The parachute item's server export; marks the parachute for `/resetparachute` until the server sees the player in freefall.
 ---@param event 'usingItem' | 'usedItem'
 ---@param item table
 ---@param inventory { id: string, source: integer }
@@ -35,14 +35,15 @@ function CobaltAddonsExports:ItemEffect(event, item) end
 function CobaltAddonsExports:Binoculars(event) end
 
 ---@alias AddonsNetEvent
----| 'cobalt_addons:server:tackle' # **Server.** `(target: integer)` asks to tackle a player within 3 m; the server checks range and sends `client:tackled`.
+---| 'cobalt_addons:server:tackle' # **Server.** `(target: integer)` asks to tackle a player within 3 m in the same routing bucket who is not dead, cuffed, escorted or in a vehicle; the server sends `client:tackled`.
 ---| 'cobalt_addons:client:tackled' # **Client.** Ragdolls the local player after a tackle.
----| 'cobalt_addons:client:fireworkFuse' # **Client.** `(coords: vector3, remaining: integer)` shows the countdown and sparks the fuse of a firework box nearby.
+---| 'cobalt_addons:client:fireworkFuse' # **Client.** `(coords: vector3, remaining?: integer)` sparks the fuse of a firework box nearby; `remaining` is sent only to the player who lit it, who sees the countdown.
 ---| 'cobalt_addons:client:fireworkLaunch' # **Client.** `(coords: vector3, show: FireworkFlash[])` plays the launch and bursts the server picked, the same for every player in view.
 
 ---@alias AddonsCallback
+---| 'cobalt_addons:server:canWash' # **Server.** Whether the player drives a vehicle at a wash and has the price in cash or bank; returns `boolean`.
 ---| 'cobalt_addons:server:washVehicle' # **Server.** Charges the car wash price, cash then bank, when the player drives a vehicle at a wash; returns `boolean`.
----| 'cobalt_addons:client:removeVest' # **Client.** Takes the vest off with a progress bar; returns `boolean`.
+---| 'cobalt_addons:client:removeVest' # **Client.** Takes the vest off with a progress bar; returns `boolean` and, once removed, the armour left as `integer`.
 ---| 'cobalt_addons:client:packParachute' # **Client.** Packs the parachute with a progress bar; returns `boolean`.
 ---| 'cobalt_addons:client:fireworkSpot' # **Client.** Finds the ground in front of the player for a firework box; returns `{ coords: vector3, heading: number }` or nothing.
 

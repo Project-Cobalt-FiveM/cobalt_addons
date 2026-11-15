@@ -13,6 +13,8 @@ dependencies {
     'cobalt_core',
     'cobalt_inventory',
     'cobalt_hud',
+    'cobalt_management',
+    'illenium-appearance',
 }
 
 ox_libs { 'locale' }

@@ -1,3 +1,5 @@
+local core <const> = exports.cobalt_core
+
 local CROUCH_CLIPSET <const> = 'move_ped_crouched'
 local CROUCH_STRAFE <const> = 'move_ped_crouched_strafing'
 
@@ -6,7 +8,12 @@ local crouching = false
 ---@param ped integer
 ---@return boolean
 local function canCrouch(ped)
+    local state <const> = LocalPlayer.state
+
+    if state.isDead or state.cuffed or state.escortedBy or core:progressActive() then return false end
+
     return not IsPedSittingInAnyVehicle(ped)
+        and not IsPedRagdoll(ped)
         and not IsPedFalling(ped)
         and not IsPedSwimming(ped)
         and not IsPedSwimmingUnderWater(ped)
@@ -27,11 +34,10 @@ local function toggle()
 
     if not canCrouch(ped) then return end
 
-    ClearPedTasks(ped)
-
     if not crouching then
         crouching = true
         lib.requestAnimSet(CROUCH_CLIPSET)
+        SetPedStealthMovement(ped, false, 'DEFAULT_ACTION')
         SetPedMovementClipset(ped, CROUCH_CLIPSET, 1.0)
         SetPedStrafeClipset(ped, CROUCH_STRAFE)
         return
@@ -41,7 +47,7 @@ local function toggle()
 end
 
 lib.addKeybind({
-    name = 'togglecrouch',
+    name = 'cobalt_addons_crouch',
     description = locale('keys.crouch'),
     defaultKey = 'LCONTROL',
     onPressed = toggle,

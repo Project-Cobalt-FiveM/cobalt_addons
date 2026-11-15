@@ -2,7 +2,7 @@ local shirtAnim <const> = { dict = 'clothingshirt', clip = 'try_shirt_positive_d
 
 return {
     -- Pause menu
-    pauseMapText = 'Project Cobalt', -- title shown on the pause map; '' shows FiveM
+    pauseMapTitle = true, -- true shows pause_map.title from locales/en.json as the pause map title; false keeps FiveM's own
 
     -- AFK kick
     afk = {
@@ -27,6 +27,18 @@ return {
         multiplier = 0.7, -- random vehicles such as service and emergency traffic
         peds = 0.6, -- pedestrians
         scenario = 0.0, -- peds and vehicles spawned by world scenarios
+    },
+
+    -- Areas whose car generators are emptied on join and on each character load: a centre and a radius in meters
+    clearedCarGenerators = {
+        { coords = vec3(335.2616, -1432.455, 46.51), radius = 300.0 },
+        { coords = vec3(441.8465, -987.99, 30.68), radius = 500.0 },
+        { coords = vec3(316.79, -592.36, 43.28), radius = 300.0 },
+        { coords = vec3(-2150.44, 3075.99, 32.8), radius = 500.0 },
+        { coords = vec3(-1108.35, 4920.64, 217.2), radius = 300.0 },
+        { coords = vec3(-458.24, 6019.81, 31.34), radius = 300.0 },
+        { coords = vec3(1854.82, 3679.4, 33.82), radius = 300.0 },
+        { coords = vec3(-724.46, -1444.03, 5.0), radius = 300.0 },
     },
 
     -- GTA's own police and emergency response
@@ -162,18 +174,16 @@ return {
         cleanupDelay = 15, -- seconds the spent box stays on the ground after launch
     },
 
-    -- Discord rich presence, shown on each player's Discord profile
+    -- Discord rich presence, shown on each player's Discord profile; its texts are the discord keys in locales/en.json
     discord = {
         enabled = false, -- true turns it on; needs a Discord application
         applicationId = '00000000000000000', -- application id from the Discord developer portal
-        iconLarge = 'logo_name', -- large image asset key uploaded to that application
-        iconLargeHoverText = 'This is a Large icon with text', -- text when hovering the large image
-        iconSmall = 'small_logo_name', -- small image asset key
-        iconSmallHoverText = 'This is a Small icon with text', -- text when hovering the small image
+        iconLarge = 'logo_name', -- large image asset key uploaded to that application; its hover text is discord.large_icon
+        iconSmall = 'small_logo_name', -- small image asset key; its hover text is discord.small_icon
         showPlayerCount = true, -- show players online out of the server's sv_maxclients slots
-        buttons = { -- up to two buttons, each a label and a link
-            { text = 'First Button!', url = 'fivem://connect/localhost:30120' },
-            { text = 'Second Button!', url = 'fivem://connect/localhost:30120' },
+        buttons = { -- up to two buttons, each a label (a key under discord in locales/en.json) and a link
+            { label = 'connect_button', url = 'fivem://connect/localhost:30120' },
+            { label = 'docs_button', url = 'https://docs.projectcobalt.net' },
         },
     },
 
@@ -182,6 +192,7 @@ return {
         dirtLevel = 0.1, -- GTA dirt level (0.0 clean to 15.0 filthy) at or below which a car counts as clean
         price = 20, -- dollars per wash
         blip = { -- FiveM blip sprite, colour and scale; category is the map legend group, named by the wash.blip_category locale
+            -- category ids from 10 up are custom; pick one no other resource uses (banking 12, garages 13, impound 15)
             sprite = 100,
             colour = 37,
             scale = 0.75,
@@ -206,7 +217,7 @@ return {
 
     -- Two-way teleports, each a pair of portals; standing in one shows a prompt and the interact key moves the player to the other
     -- length and width size the portal box in meters, heading is the direction faced on arrival there,
-    -- allowVehicle takes the vehicle along, label is the prompt shown at that portal (default 'Take the elevator')
+    -- allowVehicle takes the vehicle along, prompt names the teleport key in locales/en.json shown at that portal (default 'elevator')
     teleports = {
         {
             { coords = vec3(3540.74, 3675.59, 20.99), heading = 167.5, length = 2, width = 2, allowVehicle = false },

@@ -46,14 +46,19 @@
         "no_room": "There's no flat ground here to set it down"
     },
     "teleport": {
-        "prompt": "Take the elevator",
+        "prompt": "[%s] %s",
+        "elevator": "Take the elevator",
         "keybind": "Use a teleport or elevator"
     },
     "player": {
         "id": "ID: %s"
     },
     "discord": {
-        "players": "Players: %s/%s"
+        "players": "Players: %s/%s",
+        "large_icon": "Project Cobalt",
+        "small_icon": "Roleplay in Los Santos",
+        "connect_button": "Join the server",
+        "docs_button": "Read the docs"
     },
     "keys": {
         "binoculars_store": "Put the binoculars away",
@@ -71,5 +76,8 @@
         "saveclip": "Stop recording and save the clip",
         "delclip": "Stop recording and discard the clip",
         "editor": "Open the Rockstar Editor"
+    },
+    "pause_map": {
+        "title": "Project Cobalt"
     }
 }

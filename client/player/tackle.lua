@@ -39,9 +39,9 @@ local function tackle()
 end
 
 lib.addKeybind({
-    name = 'tackle',
+    name = 'cobalt_addons_tackle',
     description = locale('keys.tackle'),
-    defaultKey = 'LMENU',
+    defaultKey = 'G',
     onPressed = tackle,
 })
 

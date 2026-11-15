@@ -7,9 +7,9 @@ local insideWash = false
 local washing = false
 
 ---@param key string
----@param type string
-local function notify(key, type)
-    core:Notify({ description = locale(key), type = type, duration = 3000 })
+---@param kind string
+local function notify(key, kind)
+    core:Notify({ description = locale(key), type = kind, duration = 3000 })
 end
 
 ---@type CKeybind
@@ -21,18 +21,43 @@ local function driving()
     return cache.vehicle and cache.seat == -1 or false
 end
 
+local function hidePrompt()
+    if not prompting then return end
+
+    prompting = false
+    core:HideTextUI()
+end
+
 local function refreshPrompt()
     local ready <const> = insideWash and not washing and driving()
 
     keybind:disable(not ready)
 
-    if ready then
-        prompting = true
-        core:ShowTextUI(locale('wash.prompt', keybind:getCurrentKey()), { position = 'left-center' })
-    elseif prompting then
-        prompting = false
-        core:HideTextUI()
-    end
+    if not ready then return hidePrompt() end
+
+    prompting = true
+    core:ShowTextUI(locale('wash.prompt', keybind:getCurrentKey()), { position = 'left-center' })
+end
+
+---@param vehicle integer
+local function runWash(vehicle)
+    if not lib.callback.await('cobalt_addons:server:canWash', false) then return end
+
+    local completed <const> = core:Progressbar({
+        duration = math.random(4000, 8000),
+        label = locale('wash.in_progress'),
+        useWhileDead = false,
+        canCancel = true,
+        disable = { move = true, car = true },
+    })
+
+    if not completed then return notify('wash.cancel', 'error') end
+
+    if not lib.callback.await('cobalt_addons:server:washVehicle', false) then return end
+
+    SetVehicleDirtLevel(vehicle, 0.0)
+    WashDecalsFromVehicle(vehicle, 1.0)
+    notify('wash.done', 'success')
 end
 
 local function wash()
@@ -46,24 +71,7 @@ local function wash()
 
     washing = true
     refreshPrompt()
-
-    local completed <const> = core:Progressbar({
-        duration = math.random(4000, 8000),
-        label = locale('wash.in_progress'),
-        useWhileDead = false,
-        canCancel = true,
-        disable = { move = true, car = true },
-    })
-
-    if not completed then
-        notify('wash.cancel', 'error')
-    elseif lib.callback.await('cobalt_addons:server:washVehicle', false) then
-        SetVehicleDirtLevel(vehicle, 0.0)
-        SetVehicleUndriveable(vehicle, false)
-        WashDecalsFromVehicle(vehicle, 1.0)
-        notify('wash.done', 'success')
-    end
-
+    runWash(vehicle)
     washing = false
     refreshPrompt()
 end
@@ -113,3 +121,7 @@ for _, location in ipairs(config.carWash.locations) do
     AddTextComponentSubstringPlayerName(locale('wash.blip'))
     EndTextCommandSetBlipName(blip)
 end
+
+AddEventHandler('onResourceStop', function(resource)
+    if resource == cache.resource then hidePrompt() end
+end)

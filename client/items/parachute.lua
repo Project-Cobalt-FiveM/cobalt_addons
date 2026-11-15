@@ -65,4 +65,8 @@ lib.callback.register('cobalt_addons:client:packParachute', function()
     return true
 end)
 
+RegisterNetEvent('cobalt_core:Client:OnPlayerUnload', function()
+    savedBag = nil
+end)
+
 return Parachute

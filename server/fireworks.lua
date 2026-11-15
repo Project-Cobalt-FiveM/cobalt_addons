@@ -80,6 +80,12 @@ local function coolingDown(source)
     return last ~= nil and GetGameTimer() - last < settings.cooldown * 1000
 end
 
+---@param value number
+---@return boolean
+local function finite(value)
+    return value == value and value ~= math.huge and value ~= -math.huge
+end
+
 ---@param source integer
 ---@param spot unknown
 ---@return FireworkSpot?
@@ -87,6 +93,9 @@ local function parseSpot(source, spot)
     if type(spot) ~= 'table' or type(spot.coords) ~= 'vector3' or type(spot.heading) ~= 'number' then return end
 
     local coords <const> = spot.coords
+
+    if not (finite(coords.x) and finite(coords.y) and finite(coords.z) and finite(spot.heading)) then return end
+
     local ped <const> = GetEntityCoords(GetPlayerPed(source))
 
     if #(coords.xy - ped.xy) > settings.placeDistance + PLACE_SLACK then return end
@@ -193,9 +202,10 @@ local function light(source, item, spot)
     boxes[netId] = entity
 
     for remaining = settings.delay, 1, -1 do
-        local watching <const> = playersNear(coords, settings.countdownRange, bucket)
+        for _, playerId in ipairs(playersNear(coords, settings.countdownRange, bucket)) do
+            TriggerClientEvent('cobalt_addons:client:fireworkFuse', playerId, coords, playerId == source and remaining or nil)
+        end
 
-        lib.triggerClientEvent('cobalt_addons:client:fireworkFuse', watching, coords, remaining)
         Wait(1000)
 
         if boxes[netId] ~= entity then return end

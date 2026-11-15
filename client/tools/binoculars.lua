@@ -28,18 +28,17 @@ local INPUT_VEH_ZOOM_OUT <const> = 16
 ---@field inVehicle boolean
 
 local active = false
+local openCount = 0
 
 ---@type BinocularView?
 local current
 
----The lowest pitch whose bottom view ray still points ahead of the camera, so the player's body stays out of frame.
 ---@param fov number
 ---@return number
 local function minPitch(fov)
     return -90.0 + fov * 0.5 + VIEW_MARGIN
 end
 
----Places the camera in front of the eyes along the view heading, clear of the head and the binocular prop.
 ---@param view BinocularView
 ---@param heading number
 local function placeCamera(view, heading)
@@ -105,7 +104,8 @@ local function close()
     DestroyCam(view.cam, false)
 end
 
-local function open()
+---@param token integer
+local function open(token)
     local ped <const> = cache.ped
     local inVehicle <const> = IsPedSittingInAnyVehicle(ped)
 
@@ -115,7 +115,7 @@ local function open()
 
     Wait(RAISE_MS)
 
-    if not active then return end
+    if not active or openCount ~= token then return end
 
     local heading <const> = GetEntityHeading(ped)
 
@@ -158,7 +158,7 @@ local function store()
 end
 
 lib.addKeybind({
-    name = 'cobalt_binoculars_store',
+    name = 'cobalt_addons_binoculars',
     description = locale('keys.binoculars_store'),
     defaultKey = settings.storeKey,
     onPressed = store,
@@ -170,7 +170,13 @@ exports('Binoculars', function(event)
     if active then return store() end
 
     active = true
-    CreateThread(open)
+    openCount += 1
+
+    local token <const> = openCount
+
+    CreateThread(function()
+        open(token)
+    end)
 end)
 
 AddEventHandler('onResourceStop', function(resource)

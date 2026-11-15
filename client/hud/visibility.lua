@@ -13,7 +13,6 @@ end
 
 local Visibility <const> = {}
 
----Hides the game HUD and cobalt_hud until every key passed here is shown again.
 ---@param key string
 function Visibility.hide(key)
     if hiders[key] then return end

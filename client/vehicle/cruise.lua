@@ -19,9 +19,9 @@ local blockedClasses <const> = {
 }
 
 ---@param key string
----@param type string
-local function notify(key, type)
-    core:Notify({ description = locale(key), type = type, duration = 3000 })
+---@param kind string
+local function notify(key, kind)
+    core:Notify({ description = locale(key), type = kind, duration = 3000 })
 end
 
 local active = false
@@ -43,6 +43,7 @@ local function hold(vehicle, speed)
         if GetPedInVehicleSeat(vehicle, -1) ~= cache.ped then return false end
 
         if IsControlJustPressed(2, INPUT_VEH_BRAKE) then return true end
+        if not GetIsVehicleEngineRunning(vehicle) then return true end
 
         local current <const> = GetEntitySpeed(vehicle)
 
@@ -79,7 +80,7 @@ local function cruise(vehicle)
 end
 
 lib.addKeybind({
-    name = 'togglecruise',
+    name = 'cobalt_addons_cruise',
     description = locale('keys.cruise'),
     defaultKey = 'Y',
     onPressed = function()

@@ -7,6 +7,7 @@ local DisableControlAction <const> = DisableControlAction
 
 local INPUT_VEH_MOVE_LR <const> = 59
 local INPUT_VEH_MOVE_UD <const> = 60
+local AIR_CHECK_MS <const> = 100
 
 ---@type table<integer, true> motorcycle, cycle, boat, helicopter, plane
 local exemptClasses <const> = {
@@ -18,13 +19,27 @@ local exemptClasses <const> = {
 }
 
 ---@type integer?
-local interval
+local watcher
+local airborne = false
+
+---@param vehicle integer
+local function lockWhileAirborne(vehicle)
+    airborne = true
+
+    while watcher and cache.vehicle == vehicle and IsEntityInAir(vehicle) do
+        DisableControlAction(0, INPUT_VEH_MOVE_LR, true)
+        DisableControlAction(0, INPUT_VEH_MOVE_UD, true)
+        Wait(0)
+    end
+
+    airborne = false
+end
 
 local function stop()
-    if not interval then return end
+    if not watcher then return end
 
-    ClearInterval(interval)
-    interval = nil
+    ClearInterval(watcher)
+    watcher = nil
 end
 
 ---@param vehicle integer | false
@@ -36,12 +51,13 @@ local function update(vehicle, seat)
 
     if exemptClasses[GetVehicleClass(vehicle)] then return end
 
-    interval = SetInterval(function()
-        if not IsEntityInAir(vehicle) then return end
+    watcher = SetInterval(function()
+        if airborne or not IsEntityInAir(vehicle) then return end
 
-        DisableControlAction(0, INPUT_VEH_MOVE_LR, true)
-        DisableControlAction(0, INPUT_VEH_MOVE_UD, true)
-    end, 0)
+        CreateThread(function()
+            lockWhileAirborne(vehicle)
+        end)
+    end, AIR_CHECK_MS)
 end
 
 lib.onCache('vehicle', function(vehicle)

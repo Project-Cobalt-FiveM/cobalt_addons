@@ -1,9 +1,9 @@
 local core <const> = exports.cobalt_core
 
 ---@param key string
----@param type string
-local function notify(key, type)
-    core:Notify({ description = locale(key), type = type, duration = 3000 })
+---@param kind string
+local function notify(key, kind)
+    core:Notify({ description = locale(key), type = kind, duration = 3000 })
 end
 
 ---@param name string

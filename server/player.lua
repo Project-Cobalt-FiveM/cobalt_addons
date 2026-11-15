@@ -12,16 +12,33 @@ local nextTackleAt <const> = {}
 ---@type table<integer, integer>
 local tackleableAt <const> = {}
 
+---@param playerId integer
+---@return boolean
+local function isRestrained(playerId)
+    local state <const> = Player(playerId).state
+
+    return state.cuffed ~= nil or state.isDead == true or state.escortedBy ~= nil
+end
+
 ---@param source integer
 ---@return boolean
 local function canTackle(source)
-    local state <const> = Player(source).state
-
-    if state.cuffed or state.isDead then return false end
+    if isRestrained(source) then return false end
 
     local ped <const> = GetPlayerPed(source)
 
     return GetVehiclePedIsIn(ped, false) == 0 and GetEntitySpeed(ped) >= TACKLE_MIN_SPEED
+end
+
+---@param source integer
+---@param target integer
+---@param targetPed integer
+---@return boolean
+local function canBeTackled(source, target, targetPed)
+    if isRestrained(target) then return false end
+    if GetVehiclePedIsIn(targetPed, false) ~= 0 then return false end
+
+    return GetPlayerRoutingBucket(source) == GetPlayerRoutingBucket(target)
 end
 
 RegisterNetEvent('cobalt_addons:server:tackle', function(target)
@@ -36,6 +53,7 @@ RegisterNetEvent('cobalt_addons:server:tackle', function(target)
     local targetPed <const> = GetPlayerPed(target)
 
     if targetPed == 0 or not canTackle(source) then return end
+    if not canBeTackled(source, target, targetPed) then return end
 
     if #(GetEntityCoords(GetPlayerPed(source)) - GetEntityCoords(targetPed)) > TACKLE_RANGE then return end
 

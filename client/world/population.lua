@@ -3,18 +3,6 @@ local config <const> = require 'config'
 local density <const> = config.density
 local MAX_WANTED_LEVEL <const> = 5
 
----@type { coords: vector3, radius: number }[]
-local clearedGenerators <const> = {
-    { coords = vec3(335.2616, -1432.455, 46.51), radius = 300.0 },
-    { coords = vec3(441.8465, -987.99, 30.68), radius = 500.0 },
-    { coords = vec3(316.79, -592.36, 43.28), radius = 300.0 },
-    { coords = vec3(-2150.44, 3075.99, 32.8), radius = 500.0 },
-    { coords = vec3(-1108.35, 4920.64, 217.2), radius = 300.0 },
-    { coords = vec3(-458.24, 6019.81, 31.34), radius = 300.0 },
-    { coords = vec3(1854.82, 3679.4, 33.82), radius = 300.0 },
-    { coords = vec3(-724.46, -1444.03, 5.0), radius = 300.0 },
-}
-
 local function disableScenarios()
     for _, scenario in ipairs(config.blacklistedScenarios.types) do
         SetScenarioTypeEnabled(scenario, false)
@@ -25,10 +13,25 @@ local function disableScenarios()
     end
 end
 
-disableScenarios()
-RegisterNetEvent('cobalt_core:Client:OnPlayerLoaded', disableScenarios)
+local function clearCarGenerators()
+    for _, area in ipairs(config.clearedCarGenerators) do
+        local c <const>, r <const> = area.coords, area.radius
 
-AddTextEntry('FE_THDR_GTAO', config.pauseMapText ~= '' and config.pauseMapText or 'FiveM')
+        RemoveVehiclesFromGeneratorsInArea(c.x - r, c.y - r, c.z - r, c.x + r, c.y + r, c.z + r)
+    end
+end
+
+local function prepareWorld()
+    disableScenarios()
+    clearCarGenerators()
+end
+
+prepareWorld()
+RegisterNetEvent('cobalt_core:Client:OnPlayerLoaded', prepareWorld)
+
+if config.pauseMapTitle then
+    AddTextEntry('FE_THDR_GTAO', locale('pause_map.title'))
+end
 
 if config.disable.ambience then
     StartAudioScene('CHARACTER_CHANGE_IN_SKY_SCENE')
@@ -41,12 +44,6 @@ SetCreateRandomCops(false)
 SetCreateRandomCopsNotOnScenarios(false)
 SetCreateRandomCopsOnScenarios(false)
 DistantCopCarSirens(false)
-
-for _, area in ipairs(clearedGenerators) do
-    local c <const>, r <const> = area.coords, area.radius
-
-    RemoveVehiclesFromGeneratorsInArea(c.x - r, c.y - r, c.z - r, c.x + r, c.y + r, c.z + r)
-end
 
 ---@type table<string, integer>
 local DISPATCH_SERVICES <const> = {

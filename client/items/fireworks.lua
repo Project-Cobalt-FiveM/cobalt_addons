@@ -8,8 +8,12 @@ local FUSE_HEIGHT <const> = 0.3
 local FUSE_SCALE <const> = 0.4
 local COUNTDOWN_HOLD <const> = 1500
 
+---@type string?
 local countdown
 local countdownToken = 0
+
+---@type table<string, integer>
+local assetUsers <const> = {}
 
 local function hideCountdown()
     if not countdown then return end
@@ -71,9 +75,29 @@ lib.callback.register('cobalt_addons:client:fireworkSpot', function()
 end)
 
 RegisterNetEvent('cobalt_addons:client:fireworkFuse', function(coords, remaining)
-    showCountdown(remaining)
+    if remaining then showCountdown(remaining) end
+
     sparkFuse(coords)
 end)
+
+---@param asset string
+local function holdAsset(asset)
+    assetUsers[asset] = (assetUsers[asset] or 0) + 1
+    lib.requestNamedPtfxAsset(asset)
+end
+
+---@param asset string
+local function releaseAsset(asset)
+    local users <const> = assetUsers[asset] - 1
+
+    if users > 0 then
+        assetUsers[asset] = users
+        return
+    end
+
+    assetUsers[asset] = nil
+    RemoveNamedPtfxAsset(asset)
+end
 
 ---@param show FireworkFlash[]
 ---@return table<string, true>
@@ -94,7 +118,7 @@ RegisterNetEvent('cobalt_addons:client:fireworkLaunch', function(coords, show)
     local assets <const> = assetsOf(show)
 
     for asset in pairs(assets) do
-        lib.requestNamedPtfxAsset(asset)
+        holdAsset(asset)
     end
 
     for _, flash in ipairs(show) do
@@ -119,6 +143,6 @@ RegisterNetEvent('cobalt_addons:client:fireworkLaunch', function(coords, show)
     end
 
     for asset in pairs(assets) do
-        RemoveNamedPtfxAsset(asset)
+        releaseAsset(asset)
     end
 end)

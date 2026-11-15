@@ -13,6 +13,8 @@ local parachutes <const> = {}
 local vests <const> = {}
 
 local VEST_REFUND_RATIO <const> = 0.95
+local FREEFALL_SPEED <const> = -8.0
+local FALL_CHECK_MS <const> = 250
 
 ---@param source integer
 ---@param key string
@@ -47,8 +49,34 @@ exports('Armor', function(event, item, used)
     if item.client?.effect == 'vest' then vests[source] = { item = item.name, armour = armour } end
 end)
 
+---@param playerId integer
+---@return boolean
+local function isFreefalling(playerId)
+    local ped <const> = GetPlayerPed(playerId)
+
+    if ped == 0 or GetVehiclePedIsIn(ped, false) ~= 0 then return false end
+
+    return GetEntityVelocity(ped).z < FREEFALL_SPEED
+end
+
+local function watchJumps()
+    while next(parachutes) do
+        for playerId in pairs(parachutes) do
+            if isFreefalling(playerId) then parachutes[playerId] = nil end
+        end
+
+        Wait(FALL_CHECK_MS)
+    end
+end
+
 exports('Parachute', function(event, _, used)
-    if event == 'usedItem' then parachutes[used.source] = true end
+    if event ~= 'usedItem' then return end
+
+    local watching <const> = next(parachutes) ~= nil
+
+    parachutes[used.source] = true
+
+    if not watching then CreateThread(watchJumps) end
 end)
 
 Cobalt.Commands.Add('resetarmor', locale('commands.resetarmor'), {}, false, function(source)
