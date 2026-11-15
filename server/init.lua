@@ -1,4 +1,5 @@
 require 'server.items'
+require 'server.fireworks'
 require 'server.afk'
 require 'server.carwash'
 require 'server.player'

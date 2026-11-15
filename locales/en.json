@@ -41,7 +41,9 @@
         "editor": "Opening the Rockstar Editor"
     },
     "firework": {
-        "time_left": "Firework launches in %s"
+        "time_left": "Firework launches in %s",
+        "cooldown": "Give the last one a moment before lighting another",
+        "no_room": "There's no flat ground here to set it down"
     },
     "teleport": {
         "prompt": "Take the elevator",

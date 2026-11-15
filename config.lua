@@ -149,10 +149,17 @@ return {
         anim = shirtAnim, -- animation while packing
     },
 
-    -- Firework item
+    -- Firework items: the box is set down in front of the player, counts down, then launches
     fireworks = {
-        delay = 5, -- seconds of countdown before it goes off
-        asset = 'proj_indep_firework', -- particle asset used for the burst
+        model = 'ind_prop_firework_03', -- prop placed on the ground; the item's placing animation is in cobalt_inventory's data/items.lua
+        placeDistance = 0.8, -- meters in front of the player the box is set down
+        delay = 5, -- seconds of countdown before it launches
+        cooldown = 10, -- seconds a player waits before placing another firework
+        countdownRange = 50.0, -- meters within which players see the countdown and the sparking fuse
+        viewRange = 400.0, -- meters within which players see the launch and the bursts
+        burstHeight = 42.5, -- meters above the box the bursts go off
+        asset = 'proj_indep_firework', -- burst particle set: proj_indep_firework, proj_indep_firework_v2, proj_xmas_firework or scr_indep_fireworks
+        cleanupDelay = 15, -- seconds the spent box stays on the ground after launch
     },
 
     -- Discord rich presence, shown on each player's Discord profile

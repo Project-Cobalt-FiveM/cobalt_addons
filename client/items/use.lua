@@ -1,7 +1,6 @@
 local drugs <const> = require 'client.items.effects'
 local armor <const> = require 'client.items.armor'
 local parachute <const> = require 'client.items.parachute'
-local fireworks <const> = require 'client.items.fireworks'
 
 ---@type table<string, fun()>
 local effects <const> = {
@@ -12,7 +11,6 @@ local effects <const> = {
     oxy = drugs.oxy,
     vest = armor.wear,
     parachute = parachute.wear,
-    firework = fireworks.launch,
 }
 
 exports('ItemEffect', function(event, item)
